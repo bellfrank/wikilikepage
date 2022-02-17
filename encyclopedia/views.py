@@ -11,18 +11,17 @@ def index(request):
 
 def wiki(request, name):
     # Check to see if the .md file exists
-    print("inside wiki")
     mdfile = util.get_entry(name)
-    print("inside wiki")
     # If so then we convert/write to HTML
     if(mdfile == None):
-        render("encyclopedia/apology.html")
+        return render(request, "encyclopedia/apology.html")
 
-    print("Passed")
     markdowner = Markdown()
-    markdowner.convert(mdfile)
-    with open(f'{name}.html', 'w') as f:
-        f.write(markdowner)
+    html = markdowner.convert(mdfile)
+    with open(f'encyclopedia/templates/html/{name}.html', 'w') as f:
+        f.write(html)
+
+    return render(request, f"html/{name}.html")
     
 
     
