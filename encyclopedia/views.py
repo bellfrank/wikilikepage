@@ -11,6 +11,7 @@ def index(request):
 
 def wiki(request, name):
     # Check to see if the .md file exists
+    print("inside wiki")
     mdfile = util.get_entry(name)
     print("inside wiki")
     # If so then we convert/write to HTML
