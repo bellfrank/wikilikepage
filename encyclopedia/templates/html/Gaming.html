@@ -1,3 +1,8 @@
-<h1>Gaming</h1>
+{% extends "encyclopedia/layout.html" %}
+                        {% block title %}
+                            Wiki
+                        {% endblock %}
+                    {% block body %}<h1>Gaming</h1>
 
 <p>Gaming is cool</p>
+<a href="{% url 'edit' %}">Edit Page</a>{% endblock %}

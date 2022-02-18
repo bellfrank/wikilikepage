@@ -4,6 +4,8 @@ from . import util
 
 from markdown2 import Markdown
 
+import random
+
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
@@ -20,7 +22,16 @@ def wiki(request, name):
     markdowner = Markdown()
     html = markdowner.convert(mdfile)
     with open(f'encyclopedia/templates/html/{name}.html', 'w') as f:
+        header = """{% extends "encyclopedia/layout.html" %}
+                        {% block title %}
+                            Wiki
+                        {% endblock %}
+                    {% block body %}"""
+        f.write(header)
         f.write(html)
+        print("we in baby")
+        f.write("""<a href="{% url 'edit' %}">Edit Page</a>""")
+        f.write("{% endblock %}")
 
     return render(request, f"html/{name}.html")
 
@@ -48,8 +59,18 @@ def search(request):
     # else section: convert .md file to html
     markdowner = Markdown()
     html = markdowner.convert(mdfile)
+    print("about to go in")
     with open(f'encyclopedia/templates/html/{q}.html', 'w') as f:
+        header = """{% extends "encyclopedia/layout.html" %}
+                        {% block title %}
+                            Wiki
+                        {% endblock %}
+                    {% block body %}"""
+        f.write(header)
         f.write(html)
+        f.write("""<a href="{% url 'edit' %}">Edit Page</a>""")
+        print("we in baby")
+        f.write("{% endblock %}")
 
     return render(request, f"html/{q}.html")
 
@@ -72,6 +93,34 @@ def create(request):
         #else we want to create the form 
         util.save_entry(title, content)
         
-        
+        #redirecting user to the newly created page
+        mdfile = util.get_entry(title)
+
+        markdowner = Markdown()
+        html = markdowner.convert(mdfile)
+        with open(f'encyclopedia/templates/html/{title}.html', 'w') as f:
+            header = """{% extends "encyclopedia/layout.html" %}
+                            {% block title %}
+                                Wiki
+                            {% endblock %}
+                        {% block body %}"""
+            f.write(header)
+            f.write(html)
+            f.write("""<a href="{% url 'edit' %}">Edit Page</a>""")
+            f.write("{% endblock %}")
+
+        return render(request, f"html/{title}.html")
+
     else:
         return render(request, "encyclopedia/create.html")
+        
+def random_page(request):
+    listmd = util.list_entries()
+    listsize = len(listmd)
+    num = random.randrange(0,listsize-1)
+    selected = listmd[num]
+    return render(request, f"html/{selected}.html")
+
+def edit(request):
+    print("We have reached edit baby boy")
+    return render(request, "encyclopedia/edit.html")
