@@ -1,0 +1,31 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Create New Page
+{% endblock %}
+
+{% block body %}
+    <p></p>
+    <p></p>
+
+    <h2>Create New Page</h2>
+
+<form id="usrform" action="create" method="post" >
+    {% csrf_token %}
+    <label >Title:</label><br>
+    <input type="text" name="title"><br>
+
+    <label>Body:</label><br>
+    <textarea rows="4" cols="50" name="content" form="usrform"></textarea>
+    <br>
+    <input type="submit" value="Save">
+</form>
+
+<p>If you click the "Submit" button, the form-data will be sent to web server.</p>
+
+</body>
+</html>
+
+
+
+{% endblock %}

@@ -25,13 +25,27 @@ def wiki(request, name):
     return render(request, f"html/{name}.html")
 
 def search(request):
-    print("inside search")
     q = request.GET['q']
     mdfile = util.get_entry(q)
-    # If not an md entry, return error page
+
+    # If not an md entry, provide search results page with substring entries
     if(mdfile == None):
-        return render(request, "encyclopedia/apology.html")
-    # convert .md file to html
+        similar_entries = []
+        listmd = util.list_entries()
+
+        # Adding similar entries to a list
+        for i in listmd:
+            if q in i:
+                similar_entries.append(i)
+        
+        if (len(similar_entries) == 0):
+            return render(request, "encyclopedia/apology.html")
+
+        return render(request, "encyclopedia/results.html",{
+            "similar_entries" : similar_entries
+        })
+
+    # else section: convert .md file to html
     markdowner = Markdown()
     html = markdowner.convert(mdfile)
     with open(f'encyclopedia/templates/html/{q}.html', 'w') as f:
@@ -39,13 +53,25 @@ def search(request):
 
     return render(request, f"html/{q}.html")
 
+
 def create(request):
-    print("inside create")
-    q = request.GET['q']
-    print(q)
+    if request.method == "POST":
+        
+        # store title in a variable 
+        title = request.POST['title']
+        content = request.POST['content']
+        
+        # Check to see if title is already an entry
+        mdfile = util.get_entry(title)
 
-    
-
-    
-    
-
+        # If entry is already created, alert user
+        if(mdfile != None):
+            # somehow alert the user here
+            pass
+            
+        #else we want to create the form 
+        util.save_entry(title, content)
+        
+        
+    else:
+        return render(request, "encyclopedia/create.html")

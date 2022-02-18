@@ -1,9 +1,19 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block title %}
-    Encyclopedia
+    Results
 {% endblock %}
 
 {% block body %}
-    <h1>Entry doesn't exist :(</h1>
+    <p></p>
+    <p></p>
+    <h3>Search Results Page</h3>
+    <ul>
+        {% for entry in similar_entries %}
+            <li>
+                <a href="wiki/{{entry}}"> {{ entry }} </a>
+            </li>
+        {% endfor %}
+    </ul>
+
 {% endblock %}
