@@ -7,6 +7,7 @@ from markdown2 import Markdown
 
 import random
 import requests
+import os
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -117,6 +118,7 @@ def create(request):
     else:
         return render(request, "encyclopedia/create.html")
 
+
 def random_page(request):
     listmd = util.list_entries()
     listsize = len(listmd)
@@ -124,13 +126,45 @@ def random_page(request):
     selected = listmd[num]
     return render(request, f"html/{selected}.html")
 
+
 def edit(request, name):
+    print("inside edit")
     if request.method == "POST":
-        pass
+        # If not an md entry, return error page
 
-    content = util.get_entry(name)
+        title = request.POST['title']
+        content = request.POST['content']
+        mdfile = util.get_entry(title)
 
-    return render(request, "encyclopedia/edit.html", {
-        "title": name,
-        "content": content
-    })
+        if (title != name):
+            if(mdfile == None):
+                return render(request, "encyclopedia/apology2.html")
+        #else we want to create the form 
+        util.save_entry(title, content)
+        
+        #redirecting user to the newly created page
+        mdfile = util.get_entry(title)
+
+        markdowner = Markdown()
+        html = markdowner.convert(mdfile)
+        with open(f'encyclopedia/templates/html/{title}.html', 'w') as f:
+            header = """{% extends "encyclopedia/layout.html" %}
+                            {% block title %}
+                                Wiki
+                            {% endblock %}
+                        {% block body %}"""
+            f.write(header)
+            f.write(html)
+            f.write(f"""<a href="/edit/{title}">Edit Page</a>""")
+            f.write("{% endblock %}")
+        if(name == title):
+            os.remove(f"entries/{name}.md")
+        
+        return render(request, f"html/{title}.html")
+
+    else:
+        content = util.get_entry(name)
+        return render(request, "encyclopedia/edit.html", {
+            "title": name,
+            "content": content
+        })
