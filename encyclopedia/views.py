@@ -1,3 +1,4 @@
+from xml.dom.minidom import Document
 from django.shortcuts import render
 
 from . import util
@@ -5,6 +6,7 @@ from . import util
 from markdown2 import Markdown
 
 import random
+import requests
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -30,7 +32,8 @@ def wiki(request, name):
         f.write(header)
         f.write(html)
         print("we in baby")
-        f.write("""<a href="{% url 'edit' %}">Edit Page</a>""")
+        print(name)
+        f.write(f"""<a href="/edit/{name}">Edit Page</a>""")
         f.write("{% endblock %}")
 
     return render(request, f"html/{name}.html")
@@ -68,7 +71,7 @@ def search(request):
                     {% block body %}"""
         f.write(header)
         f.write(html)
-        f.write("""<a href="{% url 'edit' %}">Edit Page</a>""")
+        f.write(f"""<a href="/edit/{q}">Edit Page</a>""")
         print("we in baby")
         f.write("{% endblock %}")
 
@@ -106,14 +109,14 @@ def create(request):
                         {% block body %}"""
             f.write(header)
             f.write(html)
-            f.write("""<a href="{% url 'edit' %}">Edit Page</a>""")
+            f.write(f"""<a href="/edit/{title}">Edit Page</a>""")
             f.write("{% endblock %}")
 
         return render(request, f"html/{title}.html")
 
     else:
         return render(request, "encyclopedia/create.html")
-        
+
 def random_page(request):
     listmd = util.list_entries()
     listsize = len(listmd)
@@ -121,6 +124,13 @@ def random_page(request):
     selected = listmd[num]
     return render(request, f"html/{selected}.html")
 
-def edit(request):
-    print("We have reached edit baby boy")
-    return render(request, "encyclopedia/edit.html")
+def edit(request, name):
+    if request.method == "POST":
+        pass
+
+    content = util.get_entry(name)
+
+    return render(request, "encyclopedia/edit.html", {
+        "title": name,
+        "content": content
+    })
