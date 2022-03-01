@@ -15,27 +15,13 @@ def index(request):
     })
 
 def wiki(request, name):
+    
     # Check to see if the .md file exists
-    print("inside wiki")
     mdfile = util.get_entry(name)
+    
     # If not an md entry, return error page
     if(mdfile == None):
         return render(request, "encyclopedia/apology.html")
-    # convert .md file to html
-    markdowner = Markdown()
-    html = markdowner.convert(mdfile)
-    with open(f'encyclopedia/templates/html/{name}.html', 'w') as f:
-        header = """{% extends "encyclopedia/layout.html" %}
-                        {% block title %}
-                            Wiki
-                        {% endblock %}
-                    {% block body %}"""
-        f.write(header)
-        f.write(html)
-        print("we in baby")
-        print(name)
-        f.write(f"""<a href="/edit/{name}">Edit Page</a>""")
-        f.write("{% endblock %}")
 
     return render(request, f"html/{name}.html")
 
@@ -60,22 +46,6 @@ def search(request):
             "similar_entries" : similar_entries
         })
 
-    # else section: convert .md file to html
-    markdowner = Markdown()
-    html = markdowner.convert(mdfile)
-    print("about to go in")
-    with open(f'encyclopedia/templates/html/{q}.html', 'w') as f:
-        header = """{% extends "encyclopedia/layout.html" %}
-                        {% block title %}
-                            Wiki
-                        {% endblock %}
-                    {% block body %}"""
-        f.write(header)
-        f.write(html)
-        f.write(f"""<a href="/edit/{q}">Edit Page</a>""")
-        print("we in baby")
-        f.write("{% endblock %}")
-
     return render(request, f"html/{q}.html")
 
 
@@ -91,13 +61,12 @@ def create(request):
 
         # If entry is already created, alert user
         if(mdfile != None):
-            # somehow alert the user here
-            pass
+            return render(request, "encyclopedia/apology2.html")
+
             
         #else we want to create the form 
         util.save_entry(title, content)
         
-        #redirecting user to the newly created page
         mdfile = util.get_entry(title)
 
         markdowner = Markdown()
