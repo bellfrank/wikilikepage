@@ -1,3 +1,0 @@
-# Gaming
-
-Gaming is cool
